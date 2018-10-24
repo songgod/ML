@@ -20,3 +20,6 @@ def classify0(inX, dataSet, labels, k):
     sortedClassCount = sorted(classCount.items(),
                               key=operator.itemgetter(1),reverse=True)
     return sortedClassCount[0][0]
+
+def classify1()
+    retrun 0
