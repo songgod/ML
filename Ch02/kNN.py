@@ -1,61 +1,68 @@
 from numpy import *
 import operator
-def createDataSet():
-    group = array([[1.0,1.1],[1.0,1.0],[0.0,0.0],[0.0,0.1]])
-    labels = ['A','A','B','B']
+
+
+def createdataset():
+    group = array([[1.0, 1.1], [1.0, 1.0], [0.0, 0.0], [0.0, 0.1]])
+    labels = ['a', 'a', 'b', 'b']
     return group, labels
 
-def classify0(inX, dataSet, labels, k):
-    dataSetSize = dataSet.shape[0]
-    diffMat = tile(inX, (dataSetSize,1))-dataSet
-    sqDiffmat = diffMat**2
-    sqDistance = sqDiffmat.sum(axis=1)
-    distance = sqDistance**0.5
-    sortedDistIndicies = distance.argsort()
-    classCount={}
+
+def classify0(inx, dataset, labels, k):
+    datasetsize = dataset.shape[0]
+    diffmat = tile(inx, (datasetsize, 1))-dataset
+    sqdiffmat = diffmat**2
+    sqdistance = sqdiffmat.sum(axis=1)
+    distance = sqdistance**0.5
+    sorteddistindicies = distance.argsort()
+    classcount = {}
     for i in range(k):
-        voteIlabel = labels[sortedDistIndicies[i]]
-        classCount[voteIlabel]=classCount.get(voteIlabel,0)+1
+        voteilabel = labels[sorteddistindicies[i]]
+        classcount[voteilabel] = classcount.get(voteilabel, 0)+1
         
-    sortedClassCount = sorted(classCount.items(),
-                              key=operator.itemgetter(1),reverse=True)
-    return sortedClassCount[0][0]
+    sortedclasscount = sorted(classcount.items(),
+                              key=operator.itemgetter(1), reverse=True)
+    return sortedclasscount[0][0]
+
 
 def file2matrix(filename):
     fr = open(filename)
-    arrayOLines = fr.readlines()
-    numberOfLines = len(arrayOLines)
-    returnMat = zeros((numberOfLines,3))
-    classLabelVector=[]
+    arrayolines = fr.readlines()
+    numberoflines = len(arrayolines)
+    returnmat = zeros((numberoflines, 3))
+    classlabelvector = []
     idx = 0
-    for line in arrayOLines:
+    for line in arrayolines:
         line = line.strip()
-        listFromLine = line.split('\t')
-        returnMat[idx,:]=listFromLine[0:3]
-        classLabelVector.append((int)(listFromLine[-1]))
+        listfromline = line.split('\t')
+        returnmat[idx, :] = listfromline[0:3]
+        classlabelvector.append(int(listfromline[-1]))
         idx += 1
-    return returnMat, classLabelVector
+    return returnmat, classlabelvector
 
-def autoNormal(dataSet):
-    minVals = dataSet.min(0)
-    maxVals = dataSet.max(0)
-    ranges = maxVals-minVals
-    normaDataSet=zeros(shape(dataSet))
-    m=dataSet.shape[0]
-    normaDataSet = dataSet-tile(minVals,(m,1))
-    normaDataSet = normaDataSet/tile(ranges,(m,1))
-    return normaDataSet,ranges,minVals
 
-def datingClassTest():
-    hoRatio=0.10
-    datingData,datingLabels=file2matrix('datingTestSet2.txt')
-    normMat,ranges,minVals=autoNormal(datingData)
-    m=normMat.shape[0]
-    numTestVecs=int(m*hoRatio)
-    errorCount=0.0
-    for i in range(numTestVecs):
-        classifierResult=classify0(normMat[i,:],normMat[numTestVecs:m,:],datingLabels[numTestVecs:m],10)
-        print("the classifier came back with:%d,the real answer is:%d",classifierResult,datingLabels[i])
-        if(classifierResult!=datingLabels[i]):
-            errorCount+=1.0
-    print("the total eroor rate is:%f",errorCount/float(numTestVecs))
+def autonormal(dataset):
+    minvals = dataset.min(0)
+    maxvals = dataset.max(0)
+    ranges = maxvals-minvals
+    normadataset = zeros(shape(dataset))
+    m = dataset.shape[0]
+    t = tile(minvals, (m, 1))
+    normadataset = dataset-t
+    normadataset = normadataset/tile(ranges, (m, 1))
+    return normadataset, ranges, minvals
+
+
+def datingclasstest():
+    horatio = 0.10
+    datingdata, datinglabels = file2matrix('datingtestset2.txt')
+    normmat, ranges, minvals = autonormal(datingdata)
+    m = normmat.shape[0]
+    numtestvecs = int(m*horatio)
+    errorcount = 0.0  # type: float
+    for i in range(numtestvecs):
+        classifierresult = classify0(normmat[i, :], normmat[numtestvecs:m, :], datinglabels[numtestvecs:m], 10)
+        print("the classifier came back with:%d,the real answer is:%d", classifierresult, datinglabels[i])
+        if classifierresult != datinglabels[i]:
+            errorcount += 1.0
+    print("the total eroor rate is:%f", errorcount/float(numtestvecs))

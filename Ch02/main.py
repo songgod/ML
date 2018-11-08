@@ -1,10 +1,11 @@
-import kNN
+import knn
 import numpy as np
-datingDataMat,datingLabels=kNN.file2matrix('datingTestSet2.txt')
-normalMat,ranges,minVals=kNN.autoNormal(datingDataMat)
 import matplotlib
 import matplotlib.pyplot as plt
-fig=plt.figure()
-ax=fig.add_subplot(111)
-ax.scatter(normalMat[:,0],normalMat[:,1],15.0*np.array(datingLabels),15.0*np.array(datingLabels))
+
+datingdatamat, datinglabels = knn.file2matrix('datingtestset2.txt')
+normalmat, ranges, minvals = knn.autonormal(datingdatamat)
+fig = plt.figure()
+ax = fig.add_subplot(111)
+ax.scatter(normalmat[:, 0], normalmat[:, 1], 15.0*np.array(datinglabels), 15.0*np.array(datinglabels))
 plt.show()
