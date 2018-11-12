@@ -1,2 +1,2 @@
 import knn
-knn.datingclasstest()
+knn.handwritingclasstest()
