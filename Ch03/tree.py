@@ -1,4 +1,5 @@
 from math import log
+import operator
 
 
 def calcshannonent(dataset):
@@ -21,8 +22,7 @@ def createdataset():
                [1, 1, 'yes'],
                [1, 0, 'no'],
                [0, 1, 'no'],
-               [0, 1, 'no'],
-               [0, 0, 'maybe']]
+               [0, 1, 'no']]
     labels = ['no surfacing', 'flippers']
     return dataset, labels
 
@@ -55,3 +55,31 @@ def choosebestfeaturetosplit(dataset):
             baseinfogain = infogain
             bestfeature = i
     return bestfeature
+
+
+def majoritycnt(classlist):
+    classcount = {}
+    for vote in classlist:
+        if vote not in classcount.keys():
+            classcount[vote] = 0
+        classcount[vote] += 1
+    sortedclasscount = sorted(classcount.items(), key=operator.itemgetter(1), reverse=True)
+    return sortedclasscount[0][0]
+
+
+def createtree(dataset, labels):
+    classlist = [example[-1] for example in dataset]
+    if classlist.count(classlist[0]) == len(classlist):
+        return classlist[0]
+    if len(dataset[0]) == 1:
+        return majoritycnt(classlist)
+    bestfeat = choosebestfeaturetosplit(dataset)
+    bestfeatlabel = labels[bestfeat]
+    mytree = {bestfeatlabel : {}}
+    del(labels[bestfeat])
+    featvalues = [example[bestfeat] for example in dataset]
+    uniquevals = set(featvalues)
+    for value in uniquevals:
+        sublabels = labels[:]
+        mytree[bestfeatlabel][value] = createtree(splitdataset(dataset, bestfeat, value), sublabels)
+    return mytree
