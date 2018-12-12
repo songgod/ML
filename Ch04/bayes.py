@@ -1,5 +1,6 @@
 import numpy as np
-import math
+import random
+
 
 def loaddataset():
     postinglist = [['my', 'dog', 'has', 'flea', 'problems', 'help', 'please'],
@@ -23,7 +24,7 @@ def setofwords2vec(vocablist, inputset):
     returnvec = [0]*len(vocablist)
     for word in inputset:
         if word in vocablist:
-            returnvec[vocablist.index(word)] = 1
+            returnvec[vocablist.index(word)] += 1
         else:
             print("the word: %s is not in my vocabulary!", word)
     return returnvec
@@ -73,5 +74,46 @@ def testclassifynb():
     print(testentry, 'classfied as :', classifynb(thisdoc, p0v, p1v, pab))
 
 
+def textparse(bigstring):
+    import re
+    listtokens = re.split(r'\W*', bigstring)
+    return [tok.lower() for tok in listtokens if len(tok) > 2]
+
+
+def spamtest():
+    docklist = []
+    classlist = []
+    fulltext = []
+    for i in range(1, 26):
+        wordlist = textparse(open('email/spam/%d.txt' % i).read())
+        docklist.append(wordlist)
+        fulltext.extend(wordlist)
+        classlist.append(1)
+        wordlist = textparse(open('email/ham/%d.txt' % i).read())
+        docklist.append(wordlist)
+        fulltext.extend(wordlist)
+        classlist.append(0)
+    vacablist = createvocablist(docklist)
+    trainingset = list(range(50))
+    testset = []
+    for i in range(10):
+        randindex = int(random.uniform(0, len(trainingset)))
+        testset.append(trainingset[randindex])
+        del(trainingset[randindex])
+    trainingmat = []
+    trainingclasses = []
+    for docindex in trainingset:
+        trainingmat.append(setofwords2vec(vacablist, docklist[docindex]))
+        trainingclasses.append(classlist[docindex])
+    p0v, p1v, pspam = trainnb0(trainingmat, trainingclasses)
+    errocount = 0
+    for docindex in testset:
+        wordvector = setofwords2vec(vacablist, docklist[docindex])
+        if classifynb(wordvector, p0v, p1v, pspam) != classlist[docindex]:
+            errocount += 1
+    print('the eroor rate is:', float(errocount)/len(testset))
+
+
 if __name__ == '__main__':
-    testclassifynb()
+    #testclassifynb()
+    spamtest()
