@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import random
 
 
 def loaddataset():
@@ -28,6 +29,21 @@ def gradascent(datamat, labelmat):
         h = sigmoid(datamatrix*weights)
         error = (labelmatrix-h)
         weights = weights + alpha * datamatrix.transpose() * error
+    return weights
+
+
+def stocgradascent(datamat, labelmat, numiter=150):
+    m, n = np.shape(datamat)
+    weights = np.ones(n)
+    for j in range(numiter):
+        dataindex = list(range(m))
+        for i in range(m):
+            alpha = 4/(1.0+j+i)+0.01
+            randindex = int(random.uniform(0, len(dataindex)))
+            h = sigmoid(sum(datamat[randindex]*weights))
+            error = labelmat[randindex]-h
+            weights = weights + alpha * error * datamat[randindex]
+            del(dataindex[randindex])
     return weights
 
 
@@ -60,6 +76,7 @@ def plotbestfit(weights):
 
 if __name__ == '__main__':
     datamatv, labelmatv = loaddataset()
-    ws = gradascent(datamatv, labelmatv)
-    plotbestfit(ws.getA())
+    #ws = gradascent(datamatv, labelmatv)
+    ws = stocgradascent(np.array(datamatv), labelmatv)
+    plotbestfit(ws)
 
